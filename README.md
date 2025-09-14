@@ -6,7 +6,7 @@ A responsive and interactive website for the Naavik Maritime Awareness Campaign,
 
 ## 🚀 Live Demo
 
-[View Live Website](https://your-domain.com) 
+[View Live Website](https://tanishasharma20.github.io/maritimeawareness/) 
 
 ## 📁 File Structure
 naavik-maritime-website/
@@ -128,3 +128,36 @@ Images are optimized for web viewing
 CSS and JavaScript are minified and embedded for faster loading
 
 Consider compressing videos for better performance
+
+
+### SCREENSHOTS
+* THE ABOUT PAGE
+  
+<img width="1357" height="593" alt="Screenshot 2025-09-14 225512" src="https://github.com/user-attachments/assets/54149a33-00ff-4a59-a043-b5879e680c95" />
+
+* CITIES
+  
+<img width="1261" height="584" alt="Screenshot 2025-09-14 225546" src="https://github.com/user-attachments/assets/7f1e1056-02d8-427b-b7b0-e8cd9a471dbd" />
+
+* EVENT CALENDER
+  
+<img width="1249" height="587" alt="Screenshot 2025-09-14 225556" src="https://github.com/user-attachments/assets/09cd29f2-93f1-43c1-83c1-0c1c70a7d98f" />
+
+* VOLUNTEER FORM
+  
+<img width="1274" height="582" alt="Screenshot 2025-09-14 225613" src="https://github.com/user-attachments/assets/100bd6c5-5e11-47f0-94b1-dac218ea148e" />
+
+* CAMPAIGN GALLERY
+  
+<img width="1302" height="623" alt="Screenshot 2025-09-14 225623" src="https://github.com/user-attachments/assets/1c466d18-2511-4177-bf4a-7b057f8af1f1" />
+
+* CONTACT PAGE
+  
+<img width="1329" height="611" alt="Screenshot 2025-09-14 225649" src="https://github.com/user-attachments/assets/ea57f299-ca23-4847-8608-6ab8cd4c873c" />
+
+
+
+
+
+
+
