@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maritime Awareness Campaign | Naavik</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #002B5B;
+            --secondary: #00A8A8;
+            --accent: #FFD93D;
+            --background: #FFFFFF;
+            --light-grey: #F8F9FA;
+            --dark-text: #333333;
+            --light-text: #666666;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Open Sans', sans-serif;
+            color: var(--dark-text);
+            line-height: 1.6;
+            background-color: var(--background);
+        }
+        
+        h1, h2, h3, h4, h5 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header Styles */
+        header {
+            background-color: var(--background);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo img {
+            height: 40px;
+        }
+        
+        .nav-menu {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-menu li {
+            margin-left: 30px;
+        }
+        
+        .nav-menu a {
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+        
+        .nav-menu a:hover {
+            color: var(--secondary);
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(0, 43, 91, 0.8), rgba(0, 168, 168, 0.7)), url('https://images.unsplash.com/photo-1530533718754-001d2668365a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1500&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 160px 0 100px;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            color: white;
+            margin-bottom: 20px;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 30px;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background-color: var(--accent);
+            color: var(--primary);
+            padding: 15px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .cta-button:hover {
+            background-color: #ffc40d;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Section Styles */
+        section {
+            padding: 80px 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .section-title h2 {
+            font-size: 2.5rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background-color: var(--secondary);
+        }
+        
+        /* About Section */
+        .about-content {
+            display: flex;
+            align-items: center;
+            gap: 50px;
+        }
+        
+        .about-text {
+            flex: 1;
+        }
+        
+        .about-image {
+            flex: 1;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .about-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        /* Map Section */
+        .map-container {
+            height: 500px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        #campaign-map {
+            height: 100%;
+            width: 100%;
+        }
+        
+        .city-marker {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .city-marker i {
+            color: var(--secondary);
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        /* Event Calendar */
+        .calendar-container {
+            background-color: var(--light-grey);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .event-filters {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .filter-btn {
+            background-color: white;
+            border: 2px solid var(--secondary);
+            color: var(--primary);
+            padding: 8px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        .filter-btn.active, .filter-btn:hover {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .event-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            display: flex;
+        }
+        
+        .event-date {
+            background-color: var(--primary);
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 100px;
+        }
+        
+        .event-date .day {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        
+        .event-date .month {
+            font-size: 1rem;
+            text-transform: uppercase;
+        }
+        
+        .event-details {
+            padding: 20px;
+            flex: 1;
+        }
+        
+        .event-details h3 {
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+        
+        .event-meta {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            color: var(--light-text);
+        }
+        
+        .event-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        /* Volunteer Form */
+        .volunteer-section {
+            background-color: var(--light-grey);
+        }
+        
+        .form-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--secondary);
+            outline: none;
+        }
+        
+        /* Gallery Section */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .gallery-item {
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            height: 250px;
+            cursor: pointer;
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+        
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--primary);
+            color: white;
+            padding: 60px 0 30px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-column h3 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-links a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+        
+        .social-icons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .social-icons a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            transition: all 0.3s;
+        }
+        
+        .social-icons a:hover {
+            background-color: var(--accent);
+            color: var(--primary);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .about-content {
+                flex-direction: column;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+            
+            .hero {
+                padding: 140px 0 80px;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .event-card {
+                flex-direction: column;
+            }
+            
+            .event-date {
+                flex-direction: row;
+                justify-content: center;
+                gap: 10px;
+                padding: 15px;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <div class="logo">
+                <img src="naaviklogo.png" alt="Naavik Logo">
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#about">About</a></li>
+                <li><a href="#cities">Cities</a></li>
+                <li><a href="#events">Events</a></li>
+                <li><a href="#volunteer">Volunteer</a></li>
+                <li><a href="#gallery">Gallery</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Maritime Awareness Campaign</h1>
+            <p>Join us in promoting maritime awareness across India. Together, we can create a wave of change in Delhi, Lucknow, Bihar, and Mumbai.</p>
+            <a href="#volunteer" class="cta-button">Become a Volunteer</a>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about">
+        <div class="container">
+            <div class="section-title">
+                <h2>About the Campaign</h2>
+            </div>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>The Maritime Awareness Campaign is a nationwide initiative by Naavik to educate and engage communities about the importance of maritime resources, safety, and conservation.</p>
+                    <p>Our mission is to reach students, professionals, and coastal communities across four major regions: Delhi, Lucknow, Bihar, and Mumbai. Through interactive workshops, seminars, and community events, we aim to foster a deeper understanding of our maritime heritage and responsibilities.</p>
+                    <p>This campaign focuses on key areas such as marine conservation, maritime safety practices, career opportunities in the maritime sector, and the economic importance of oceans and waterways to our nation.</p>
+                </div>
+                <div class="about-image">
+                    <img src="9.png"Maritime Awareness">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Map Section -->
+    <section id="cities" style="background-color: var(--light-grey);">
+        <div class="container">
+            <div class="section-title">
+                <h2>Cities We Cover</h2>
+            </div>
+            <div class="map-container">
+                <div id="campaign-map"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Event Calendar -->
+    <section id="events">
+        <div class="container">
+            <div class="section-title">
+                <h2>Event Calendar</h2>
+            </div>
+            <div class="calendar-container">
+                <div class="event-filters">
+                    <button class="filter-btn active" data-filter="all">All Events</button>
+                    <button class="filter-btn" data-filter="delhi">Delhi</button>
+                    <button class="filter-btn" data-filter="lucknow">Lucknow</button>
+                    <button class="filter-btn" data-filter="bihar">Bihar</button>
+                    <button class="filter-btn" data-filter="mumbai">Mumbai</button>
+                </div>
+                
+                <div class="event-list">
+                    <div class="event-card" data-city="delhi">
+                        <div class="event-date">
+                            <span class="day">15</span>
+                            <span class="month">Sep</span>
+                        </div>
+                        <div class="event-details">
+                            <h3>Maritime Conservation Workshop</h3>
+                            <div class="event-meta">
+                                <span><i class="fas fa-map-marker-alt"></i> Delhi Public School, Delhi</span>
+                                <span><i class="fas fa-clock"></i> 10:00 AM - 2:00 PM</span>
+                            </div>
+                            <p>Join us for an interactive workshop on maritime conservation techniques and how students can contribute to protecting our oceans.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="event-card" data-city="lucknow">
+                        <div class="event-date">
+                            <span class="day">18</span>
+                            <span class="month">Sep</span>
+                        </div>
+                        <div class="event-details">
+                            <h3>Career Opportunities in Maritime Sector</h3>
+                            <div class="event-meta">
+                                <span><i class="fas fa-map-marker-alt"></i> Lucknow University, Lucknow</span>
+                                <span><i class="fas fa-clock"></i> 11:00 AM - 4:00 PM</span>
+                            </div>
+                            <p>Learn about various career paths in the maritime industry from experts and professionals currently working in the field.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="event-card" data-city="bihar">
+                        <div class="event-date">
+                            <span class="day">22</span>
+                            <span class="month">Sep</span>
+                        </div>
+                        <div class="event-details">
+                            <h3>River Conservation Awareness Drive</h3>
+                            <div class="event-meta">
+                                <span><i class="fas fa-map-marker-alt"></i> Gandhi Maidan, Patna</span>
+                                <span><i class="fas fa-clock"></i> 9:00 AM - 1:00 PM</span>
+                            </div>
+                            <p>Participate in our awareness drive focusing on river conservation and the importance of inland waterways to Bihar's ecosystem.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="event-card" data-city="mumbai">
+                        <div class="event-date">
+                            <span class="day">25</span>
+                            <span class="month">Sep</span>
+                        </div>
+                        <div class="event-details">
+                            <h3>Coastal Cleanup Initiative</h3>
+                            <div class="event-meta">
+                                <span><i class="fas fa-map-marker-alt"></i> Juhu Beach, Mumbai</span>
+                                <span><i class="fas fa-clock"></i> 7:00 AM - 11:00 AM</span>
+                            </div>
+                            <p>Be part of our coastal cleanup drive and learn about the impact of plastic pollution on marine life and ecosystems.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Volunteer Form -->
+    <section id="volunteer" class="volunteer-section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Become a Volunteer</h2>
+            </div>
+            <div class="form-container">
+                <form id="volunteer-form">
+                    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 250px;">
+                            <div class="form-group">
+                                <label for="name">Full Name</label>
+                                <input type="text" id="name" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Phone Number</label>
+                                <input type="tel" id="phone" class="form-control" required>
+                            </div>
+                        </div>
+                        <div style="flex: 1; min-width: 250px;">
+                            <div class="form-group">
+                                <label for="city">City of Interest</label>
+                                <select id="city" class="form-control" required>
+                                    <option value="">Select a city</option>
+                                    <option value="delhi">Delhi</option>
+                                    <option value="lucknow">Lucknow</option>
+                                    <option value="bihar">Bihar</option>
+                                    <option value="mumbai">Mumbai</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="organization">School/Organization</label>
+                                <input type="text" id="organization" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="availability">Availability</label>
+                                <select id="availability" class="form-control">
+                                    <option value="">Select availability</option>
+                                    <option value="weekdays">Weekdays</option>
+                                    <option value="weekends">Weekends</option>
+                                    <option value="both">Both</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Why do you want to volunteer? (Optional)</label>
+                        <textarea id="message" class="form-control" rows="4"></textarea>
+                    </div>
+                    <button type="submit" class="cta-button" style="margin-top: 20px;">Submit Application</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section id="gallery">
+        <div class="container">
+            <div class="section-title">
+                <h2>Campaign Gallery</h2>
+            </div>
+            <div class="gallery-grid">
+                <div class="gallery-item">
+                    <img src="5.png" alt="Awareness Workshop">
+                </div>
+                <div class="gallery-item">
+                    <img src="2.png" alt="Beach Cleanup">
+                </div>
+                <div class="gallery-item">
+                    <img src="4.png" alt="Student Engagement">
+                </div>
+                <div class="gallery-item">
+                    <img src="3.png" alt="Maritime Exhibition">
+                </div>
+                <div class="gallery-item">
+                    <img src="6.png" alt="Community Event">
+                </div>
+                <div class="gallery-item">
+                    <img src="8.png" alt="Educational Materials">
+                </div>
+            </div>
+            
+            <div style="margin-top: 50px;">
+                <h3 style="text-align: center; margin-bottom: 30px;">Campaign Video</h3>
+                <div class="video-container">
+                    <iframe src="iam.mp4" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>About Naavik</h3>
+                    <p>Naavik is dedicated to promoting maritime awareness and education across India, fostering a new generation of ocean stewards and maritime professionals.</p>
+                    <div class="social-icons">
+                        <a href="https://www.facebook.com/"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://x.com/home"><i class="fab fa-twitter"></i></a>
+                        <a href="https://www.instagram.com/"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.linkedin.com/company/naavik-official/"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="#about">About Campaign</a></li>
+                        <li><a href="#cities">Cities Covered</a></li>
+                        <li><a href="#events">Event Calendar</a></li>
+                        <li><a href="#volunteer">Volunteer</a></li>
+                        <li><a href="#gallery">Gallery</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact Us</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-envelope"></i> info@naavik.org</li>
+                        <li><i class="fas fa-phone"></i> +91 9876543210</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Maritime House, Mumbai, India</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 Naavik Maritime Awareness Campaign. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        // Initialize map
+        function initMap() {
+            const map = L.map('campaign-map').setView([23.5937, 78.9629], 5);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Add markers for each city
+            const cities = [
+                { name: 'Delhi', latlng: [28.6139, 77.2090] },
+                { name: 'Lucknow', latlng: [26.8467, 80.9462] },
+                { name: 'Bihar', latlng: [25.0961, 85.3131] },
+                { name: 'Mumbai', latlng: [19.0760, 72.8777] }
+            ];
+            
+            cities.forEach(city => {
+                L.marker(city.latlng)
+                    .addTo(map)
+                    .bindPopup(`<div class="city-marker"><i class="fas fa-map-marker-alt"></i> <strong>${city.name}</strong></div>`)
+                    .openPopup();
+            });
+        }
+        
+        // Event filtering
+        document.addEventListener('DOMContentLoaded', function() {
+            initMap();
+            
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const eventCards = document.querySelectorAll('.event-card');
+            
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Remove active class from all buttons
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    button.classList.add('active');
+                    
+                    const filter = button.getAttribute('data-filter');
+                    
+                    eventCards.forEach(card => {
+                        if (filter === 'all' || card.getAttribute('data-city') === filter) {
+                            card.style.display = 'flex';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+            
+            // Form submission
+            const volunteerForm = document.getElementById('volunteer-form');
+            if (volunteerForm) {
+                volunteerForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    alert('Thank you for your interest in volunteering! We will contact you soon.');
+                    volunteerForm.reset();
+                });
+            }
+        });
+    </script>
+</body>
+</html>
